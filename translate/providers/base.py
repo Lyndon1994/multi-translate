@@ -10,14 +10,13 @@ class BaseProvider:
     name = ''
     base_url = ''
 
-    def __init__(self, to_lang, from_lang='en', secret_access_key=None, region=None, **kwargs):
+    def __init__(self, to_lang, from_lang='auto', **kwargs):
         self.headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebit/535.19'
                                       '(KHTML, like Gecko) Chrome/18.0.1025.168 Safari/535.19'}
         self.from_lang = from_lang
         self.to_lang = to_lang
-        self.secret_access_key = secret_access_key
-        self.region = region
         self.kwargs = kwargs
+        self.ignore_error = True
 
     @abstractmethod
     def get_translation(self, params):

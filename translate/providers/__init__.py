@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-from .mymemory_translated import MyMemoryProvider  # noqa
-from .microsoft import MicrosoftProvider  # noqa
+from .mymemory import MyMemoryProvider  # noqa
 from .deepl import DeeplProvider  # noqa
-from .libre import LibreProvider
+from .baidu import BaiduProvider
+from .bing import BingProvider
+from .google import GoogleProvider
+from .tencent import TencentProvider
+from .youdao import YoudaoProvider
 
-__all__ = ['MyMemoryProvider', 'MicrosoftProvider', 'DeeplProvider', 'LibreProvider']
+__all__ = ['MyMemoryProvider', 'BaiduProvider', 'DeeplProvider', 'BingProvider', 'GoogleProvider', 'TencentProvider', 'YoudaoProvider']

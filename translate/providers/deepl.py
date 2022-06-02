@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # encoding: utf-8
-import requests
+import requests_async as requests
 import json
 
 from .base import BaseProvider
-from ..constants import TRANSLATION_FROM_DEFAULT
 from ..exceptions import TranslationError
 
+TRANSLATION_FROM_DEFAULT = 'autodetect'
 
 class DeeplProvider(BaseProvider):
     '''
@@ -26,10 +26,11 @@ class DeeplProvider(BaseProvider):
             super(DeeplProvider, self).__init__(**kwargs)
         self.pro = self.kwargs.get('pro', False)
         self.base_url = self.base_pro_url if self.pro else self.base_free_url
+        self.secret_key = kwargs.get('secret_key', '')
 
-    def _make_request(self, text):
+    async def _make_request(self, text):
         params = {
-            'auth_key': self.secret_access_key,
+            'auth_key': self.secret_key,
             'target_lang': self.to_lang,
             'text': text
         }
@@ -39,14 +40,14 @@ class DeeplProvider(BaseProvider):
 
         if self.session is None:
             self.session = requests.Session()
-        response = self.session.post(self.base_url, params=params, headers=self.headers, json=[{}])
-        response.raise_for_status()
+        response = await self.session.post(self.base_url, params=params, headers=self.headers, json=[{}])
+        # response.raise_for_status()
         return json.loads(response.text)
 
-    def get_translation(self, text):
-        data = self._make_request(text)
+    async def get_translation(self, text):
+        data = await self._make_request(text)
 
         if "error" in data:
             raise TranslationError(data["error"]["message"])
 
-        return data["translations"][0]["text"]
+        return [data["translations"][0]["text"]]

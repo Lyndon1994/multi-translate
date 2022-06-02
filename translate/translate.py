@@ -1,45 +1,61 @@
 #!/usr/bin/env python
 # encoding: utf-8
-from textwrap import wrap
-
+import asyncio
 from .exceptions import InvalidProviderError
-from .providers import MyMemoryProvider, MicrosoftProvider, DeeplProvider, LibreProvider
+from .providers import MyMemoryProvider, BaiduProvider, DeeplProvider, TencentProvider, YoudaoProvider, GoogleProvider, BingProvider
 
-DEFAULT_PROVIDER = MyMemoryProvider
-TRANSLATION_API_MAX_LENGTH = 1000
 
 PROVIDERS_CLASS = {
     'mymemory': MyMemoryProvider,
-    'microsoft': MicrosoftProvider,
     'deepl': DeeplProvider,
-    'libre': LibreProvider,
+    'baidu': BaiduProvider,
+    'tencent': TencentProvider,
+    'youdao': YoudaoProvider,
+    'google': GoogleProvider,
+    'bing': BingProvider,
 }
 
 
 class Translator:
-    def __init__(self, to_lang, from_lang='en', provider=None, secret_access_key=None, region=None, **kwargs):
+    def __init__(self, to_lang, from_lang='auto', providers=[MyMemoryProvider], timeout=2, **kwargs):
         self.available_providers = list(PROVIDERS_CLASS.keys())
         self.from_lang = from_lang
         self.to_lang = to_lang
-        if provider and provider not in self.available_providers:
-            raise InvalidProviderError(
-                'Provider class invalid. '
-                'Please check providers list below: {!r}'.format(self.available_providers)
-            )
+        self.timeout = timeout
 
-        provider_class = PROVIDERS_CLASS.get(provider, DEFAULT_PROVIDER)
+        self.providers = []
+        for provider in providers:
+            if provider not in self.available_providers:
+                raise InvalidProviderError(
+                    'Provider class invalid. '
+                    'Please check providers list below: {!r}'.format(
+                        self.available_providers)
+                )
 
-        self.provider = provider_class(
-            from_lang=from_lang,
-            to_lang=to_lang,
-            secret_access_key=secret_access_key,
-            region=region,
-            **kwargs
-        )
+            provider_class = PROVIDERS_CLASS.get(provider)
+
+            self.providers.append(provider_class(
+                name=provider,
+                from_lang=from_lang,
+                to_lang=to_lang,
+                **kwargs.get(provider)
+            ))
 
     def translate(self, text):
         if self.from_lang == self.to_lang:
             return text
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        # loop = asyncio.get_event_loop()
+        return loop.run_until_complete(self.run(text))
 
-        text_list = wrap(text, TRANSLATION_API_MAX_LENGTH, replace_whitespace=False)
-        return ' '.join(self.provider.get_translation(text_wraped) for text_wraped in text_list)
+    async def run(self, query):
+        tasks = []
+        for provider in self.providers:
+            tasks.append(asyncio.create_task(
+                self.provider.get_translation(query), name=provider.name))
+        dones, _ = await asyncio.wait(tasks, timeout=self.timeout)
+        results = {}
+        for done in dones:
+            results[done.get_name()] = done.result()
+        return results

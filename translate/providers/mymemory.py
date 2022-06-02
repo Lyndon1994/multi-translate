@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # encoding: utf-8
-import requests
+import requests_async as requests
 
 from .base import BaseProvider
 from ..exceptions import TranslationError
@@ -32,19 +32,19 @@ class MyMemoryProvider(BaseProvider):
         self.email = kwargs.get('email', '')
         self.languages = '{}|{}'.format(self.from_lang, self.to_lang)
 
-    def _make_request(self, text):
+    async def _make_request(self, text):
         params = {'q': text, 'langpair': self.languages}
         if self.email:
             params['de'] = self.email
 
         if self.session is None:
             self.session = requests.Session()
-        response = self.session.get(self.base_url, params=params, headers=self.headers)
-        response.raise_for_status()
+        response = await self.session.get(self.base_url, params=params, headers=self.headers)
+        # response.raise_for_status()
         return response.json()
 
-    def get_translation(self, text):
-        data = self._make_request(text)
+    async def get_translation(self, text):
+        data = await self._make_request(text)
 
         translation = data['responseData']['translatedText']
         if data['responseStatus'] != 200:
@@ -52,8 +52,8 @@ class MyMemoryProvider(BaseProvider):
             e.json = data
             raise e
         if translation:
-            return translation
+            return [translation]
         else:
             matches = data['matches']
             next_best_match = next(match for match in matches)
-            return next_best_match['translation']
+            return [next_best_match['translation']]
