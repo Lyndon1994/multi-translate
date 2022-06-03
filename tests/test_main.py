@@ -14,12 +14,17 @@ from .vcr_conf import vcr
 response_template = (
     '\nTranslation: {}\n'
     '-------------------------\n'
-    'Translated by: MyMemory\n'
+    'Translated by: youdao\n'
+)
+mymemory_response_template = (
+    '\nTranslation: {}\n'
+    '-------------------------\n'
+    'Translated by: mymemory\n'
 )
 deepl_response_template = (
     '\nTranslation: {}\n'
     '-------------------------\n'
-    'Translated by: Deepl\n'
+    'Translated by: deepl\n'
 )
 deepl_secret = 'secret'
 
@@ -27,26 +32,26 @@ deepl_secret = 'secret'
 @vcr.use_cassette
 def test_main_language_to_translate_required(cli_runner):
     result = cli_runner.invoke(main, ['hello', 'world'], input='zh')
-    response = response_template.format('你好，世界')
+    response = response_template.format('你好世界')
     assert 'Translate to []: zh\n{}'.format(response) == result.output
 
 
 @vcr.use_cassette
 def test_main_to_language(cli_runner):
     result = cli_runner.invoke(main, ['-t', 'zh-TW', 'love'])
-    assert response_template.format('爱') == result.output
+    assert '爱' in result.output
 
 
 @vcr.use_cassette
 def test_main_to_language_output_only(cli_runner):
     result = cli_runner.invoke(main, ['-t', 'zh-TW', '-o', 'love'])
-    assert '爱\n' == result.output
+    assert '爱' in result.output
 
 
 @vcr.use_cassette
 def test_main_from_language(cli_runner):
     result = cli_runner.invoke(main, ['--from', 'ja', '--to', 'zh', '美'])
-    assert response_template.format('美') == result.output
+    assert response_template.format('美') in result.output
 
 
 @mock.patch('translate.main.__version__', '0.0.0')
@@ -57,5 +62,5 @@ def test_main_get_vesion(cli_runner):
 
 @unittest.skipIf(deepl_secret == 'secret', 'No authentication token provided for DeepL')
 def test_main_deepl_provider(cli_runner):
-    result = cli_runner.invoke(main, ['--provider', 'deepl', '--from', 'de', '--to', 'zh', '--secret_access_key', deepl_secret, 'the book is on the table'])
+    result = cli_runner.invoke(main, ['--provider', 'deepl', '--from', 'de', '--to', 'zh', '--secret_key', deepl_secret, 'the book is on the table'])
     assert deepl_response_template.format('书在桌上') == result.output

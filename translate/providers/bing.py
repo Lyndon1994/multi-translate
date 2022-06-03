@@ -42,9 +42,6 @@ class BingProvider(BaseProvider):
             request = await requests.post(
                 self.base_url, params=params, headers=headers, json=body, verify=False)
             response = request.json()
-            return [response[0]['translations'][0]['text']]
+            return response[0]['translations'][0]['text']
         except Exception as err:
-            if self.ignore_error:
-                logging.error(err)
-            else:
-                raise TranslationError(err)
+            self.error = err

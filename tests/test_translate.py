@@ -18,19 +18,19 @@ def test_tranlate_with_invalid_provider():
     with pytest.raises(InvalidProviderError) as error:
         Translator(to_lang='en', provider='invalid_provider')
 
-    assert 'Provider class invalid. Please check providers list below:' in str(error.value)
+    assert 'Provider invalid_provider invalid. Please check providers list below:' in str(error.value)
 
 
 def test_tranlate_with_valid_provider():
     translator = Translator(to_lang='en', provider='mymemory')
-    assert isinstance(translator.provider, MyMemoryProvider)
+    assert isinstance(translator.providers[0], MyMemoryProvider)
 
 
 def test_tranlate_with_provider_extra_argument():
     # Case from MyMemoryProvider extra argument
     email = 'test@test.com'
-    translator = Translator(to_lang='en', email=email)
-    assert translator.provider.email == email
+    translator = Translator(to_lang='en', provider='mymemory', email=email)
+    assert translator.providers[0].email == email
 
 
 @vcr.use_cassette
@@ -41,45 +41,38 @@ def test_tranlate_english_to_english():
 
 
 @vcr.use_cassette
-def test_translate_english_to_chinese_traditional():
-    translator = Translator(to_lang='zh-TW')
-    translation = translator.translate('hello world')
-    assert u'你好，世界' == translation
-
-
-@vcr.use_cassette
 def test_translate_english_to_portuguese():
-    translator = Translator(to_lang='pt-BR')
+    translator = Translator(to_lang='pt')
     translation = translator.translate('hello world')
-    assert u'olá mundo' == translation
+    assert u'Olá, mundo' == translation
 
 
 @vcr.use_cassette
 def test_translate_english_to_chinese_simplified():
-    translator = Translator(to_lang='zh-CN')
+    translator = Translator(to_lang='zh')
     translation = translator.translate('hello world')
-    assert u'你好，世界' == translation
+    assert u'你好世界' == translation
 
 
 @vcr.use_cassette
 def test_translate_with_quote():
     translator = Translator(to_lang='zh')
     translation = translator.translate("What is 'yinyang'?")
-    assert u'什么是“阴阳”？' == translation
+    assert u'“阴阳”是什么?' == translation
 
 
 @vcr.use_cassette
 def test_translate_with_multiple_sentences():
     translator = Translator(to_lang='zh')
     translation = translator.translate('yes or no')
-    assert u'是或否' in translation
+    assert u'是或不是' in translation
 
 
 @vcr.use_cassette
 def test_translate_with_HTTPError():
-    import requests
-    t = Translator(to_lang='de', provider='mymemory')
-    t.provider.base_url += '-nonsense'
+    import requests_async as requests
+    t = Translator(to_lang='de', provider='mymemory', ignore_error=False)
+    t.providers[0].base_url += '-nonsense'
     with pytest.raises(requests.HTTPError) as error:
         t.translate('hello')
     assert '404' in str(error)
@@ -87,8 +80,8 @@ def test_translate_with_HTTPError():
 
 @vcr.use_cassette
 def test_translate_with_status_error():
-    import requests
-    t = Translator(to_lang='de', provider='mymemory', email='invalid')
+    import requests_async as requests
+    t = Translator(to_lang='de', provider='mymemory', email='invalid', ignore_error=False)
     with pytest.raises((TranslationError, requests.HTTPError)) as error:
         t.translate('hello again!')
     assert 'INVALID EMAIL' in str(error).upper()
@@ -97,6 +90,6 @@ def test_translate_with_status_error():
 @mock.patch('requests.get')
 def test_tranlate_taking_secondary_match(mock_requests, main_translation_not_found):
     mock_requests.return_value.json.return_value = main_translation_not_found
-    translator = Translator(to_lang='zh-TW')
+    translator = Translator(to_lang='zh')
     translation = translator.translate('unknown')
-    assert '未知' == translation
+    assert '未知' in translation

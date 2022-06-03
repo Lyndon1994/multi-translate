@@ -35,7 +35,7 @@ cov-report:
 test: pip-install-build
 	py.test -vv -s
 
-build: test
+build: clean test
 	python setup.py sdist
 	python setup.py bdist_wheel
 

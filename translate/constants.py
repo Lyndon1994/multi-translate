@@ -1,0 +1,6 @@
+CONFIG_FILE_PATH = '~/.python-translate.cfg'
+DEFAULT_PROVIDER = 'youdao'
+TRANSLATION_FROM_DEFAULT = 'auto'
+
+YOUDAO_APP_KEY = '4bd88aaee60cfd1b'
+YOUDAO_APP_SECRET = 'AWYJwixrYgrhkF5im8ft9zZMBZigGGb6'

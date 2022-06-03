@@ -1,4 +1,4 @@
-.. Translate Python documentation master file, created by
+.. Translate Python documentation main file, created by
    sphinx-quickstart on Wed Nov 29 06:50:23 2017.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.

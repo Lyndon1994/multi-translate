@@ -9,8 +9,8 @@ from setuptools import find_packages, setup, Command
 here = os.path.dirname(os.path.abspath(__file__))
 version = '0.0.0'
 description = (
-    'This is a simple, yet powerful command line translator with google translate behind it. '
-    'You can also use it as a Python module in your code.'
+    'Concurrently request multiple translation platforms. '
+    'Support Baidu, Bing, Deepl, Google, MyMemory, Tencent, Youdao.'
 )
 changes = os.path.join(here, "CHANGES.rst")
 pattern = r'^(?P<version>[0-9]+.[0-9]+(.[0-9]+)?)'
@@ -75,8 +75,8 @@ with codecs.open(os.path.join(here, 'requirements-dev.txt')) as f:
 def run():
     save_version()
     return setup(
-    author='Terry Yin',
-    author_email='terry.yinze@gmail.com',
+    author='Robin Lin',
+    author_email='wuhulinyi@gmail.com',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Education',
@@ -84,9 +84,7 @@ def run():
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python',
         'Topic :: Education',
     ],
@@ -97,14 +95,14 @@ def run():
         translate-cli=translate.__main__:cli
     ''',
     install_requires=install_requirements,
-    keywords='translate translation command line',
+    keywords='translate translation command line multi youdao tencent baidu',
     license='MIT',
     long_description=long_description,
-    name='translate',
+    name='multi-translate',
     packages=find_packages(exclude=['docs', 'tests', 'tests.*', 'requirements']),
     setup_requires=['pytest-runner'],
     tests_require=tests_requirements,
-    url='https://github.com/terryyin/google-translate-python',
+    url='https://github.com/Lyndon1994/multi-translate',
     version=version,
 )
 

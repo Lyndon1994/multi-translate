@@ -50,7 +50,7 @@ Options
       -t, --to TEXT             Sets the language you want to translate.
       -p, --provider TEXT       Set the provider you want to use. The default
                                 value is 'mymemory'.
-      --secret_access_key TEXT  Set the secret access key used to get provider
+      --secret_key TEXT  Set the secret access key used to get provider
                                 oAuth token.
       -o, --output_only         Set to display the translation only.
       --help                    Show this message and exit.
@@ -67,7 +67,7 @@ In ~/.python-translate.cfg:
    from_lang = autodetect
    to_lang = de
    provider = mymemory
-   secret_access_key =
+   secret_key =
 
 The cfg is not for using as a Python module.
 
@@ -105,6 +105,6 @@ Use a different translation provider
     In [1]: from translate import Translator
     In [2]: to_lang = 'zh'
     In [3]: secret = '<your secret from Microsoft>'
-    In [4]: translator = Translator(provider='microsoft', to_lang=to_lang, secret_access_key=secret)
+    In [4]: translator = Translator(provider='microsoft', to_lang=to_lang, secret_key=secret)
     In [5]: translator.translate('the book is on the table')
     Out [5]: '碗是在桌子上。'

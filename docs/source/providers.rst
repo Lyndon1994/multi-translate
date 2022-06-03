@@ -4,18 +4,18 @@ Providers
 Providers are responsible to translate the text
 
 
-MicrosoftProvider
+BingProvider
 -----------------
 
 It is a paid provider but it is possible you can create a free account tends a quota of up to 2m of words per day
 
-``MicrosoftProvider`` (located at ``translate.providers``) receives the following options:
+``BingProvider`` (located at ``translate.providers``) receives the following options:
 
-to_lang, from_lang='en', secret_access_key
+to_lang, from_lang='en', secret_key
 
     * ``to_lang``: language you want to translate
     * ``from_lang``: Language of the text being translated  (optional): as default ``autodetect``
-    * ``secret_access_key``: oAuth Access Token
+    * ``secret_key``: oAuth Access Token
 
 for further information abount the provider:
 
@@ -48,11 +48,11 @@ Free and open source translation provider
 
 ``LibreTranslate`` (located at ``translate.providers``) receives the following options:
 
-to_lang, from_lang='en', secret_access_key=None, base_url="https://translate.astian.org/"
+to_lang, from_lang='en', secret_key=None, base_url="https://translate.astian.org/"
 
     * ``to_lang``: language you want to translate
     * ``from_lang``: Language of the text being translated  (optional): as default ``autodetect``
-    * ``secret_access_key``: LibreTranslate API key
+    * ``secret_key``: LibreTranslate API key
 	* ``base_url``: LibreTranslate instance url
 
 for further information abount the provider:

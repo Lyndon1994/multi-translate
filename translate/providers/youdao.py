@@ -2,6 +2,7 @@
 # encoding: utf-8
 from ..exceptions import TranslationError
 from .base import BaseProvider
+from ..constants import YOUDAO_APP_KEY, YOUDAO_APP_SECRET
 import logging
 import uuid
 import requests_async as requests
@@ -21,8 +22,8 @@ class YoudaoProvider(BaseProvider):
         except TypeError:
             super(YoudaoProvider, self).__init__(**kwargs)
 
-        self.app_key = kwargs.get('app_key', '')
-        self.app_secret = kwargs.get('app_secret', '')
+        self.app_key = kwargs.get('app_key', YOUDAO_APP_KEY)
+        self.app_secret = kwargs.get('app_secret', YOUDAO_APP_SECRET)
 
     def __encrypt(self, signStr):
         hash_algorithm = hashlib.sha256()
@@ -45,7 +46,7 @@ class YoudaoProvider(BaseProvider):
             data['curtime'] = curtime
             salt = str(uuid.uuid1())
             signStr = self.app_key + \
-                self.__truncate(txt) + salt + curtime + self.app_secret
+                      self.__truncate(txt) + salt + curtime + self.app_secret
             sign = self.__encrypt(signStr)
             data['appKey'] = self.app_key
             data['q'] = txt
@@ -56,10 +57,7 @@ class YoudaoProvider(BaseProvider):
             response = await requests.post(self.base_url, data=data, headers=headers)
             result = response.json()
             if result.get('basic', {}).get('explains'):
-                return result.get('basic', {}).get('explains')
-            return [result['translation'][0]]
+                return '||'.join(result.get('basic', {}).get('explains'))
+            return result['translation'][0]
         except Exception as err:
-            if self.ignore_error:
-                logging.error(err)
-            else:
-                raise TranslationError(err)
+            self.error = err

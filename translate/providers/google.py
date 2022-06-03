@@ -1,4 +1,3 @@
-
 import requests_async as requests
 import logging
 from .base import BaseProvider
@@ -6,7 +5,6 @@ from ..exceptions import TranslationError
 
 
 class GoogleProvider(BaseProvider):
-
     name = 'google'
     base_url = 'http://translate.google.cn/translate_a/single'
 
@@ -24,10 +22,11 @@ class GoogleProvider(BaseProvider):
                 'ie': 'UTF-8',
                 'q': txt
             }
-            result = await requests.get(self.base_url, params=param)
-            return [result.json()[0][0][0]]
+            from urllib.parse import urlencode
+            # querystring = urlencode(param)
+            # print(self.base_url + '?' + querystring)
+            result = await requests.get(self.base_url, params=param, headers=self.headers, proxies=self.proxies)
+            logging.debug(result.content)
+            return result.json()[0][0][0]
         except Exception as err:
-            if self.ignore_error:
-                logging.error(err)
-            else:
-                raise TranslationError(err)
+            self.error = err

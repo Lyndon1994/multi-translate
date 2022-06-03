@@ -47,8 +47,8 @@ templates_path = ['_templates']
 # source_suffix = ['.rst', '.md']
 source_suffix = '.rst'
 
-# The master toctree document.
-master_doc = 'index'
+# The main toctree document.
+main_doc = 'index'
 
 # General information about the project.
 project = 'Translate Python'
@@ -149,7 +149,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'TranslatePython.tex', 'Translate Python Documentation',
+    (main_doc, 'TranslatePython.tex', 'Translate Python Documentation',
      'Terry Yin, Rafael Henter', 'manual'),
 ]
 
@@ -159,7 +159,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'translatepython', 'Translate Python Documentation',
+    (main_doc, 'translatepython', 'Translate Python Documentation',
      [author], 1)
 ]
 
@@ -170,7 +170,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'TranslatePython', 'Translate Python Documentation',
+    (main_doc, 'TranslatePython', 'Translate Python Documentation',
      author, 'TranslatePython', 'One line description of project.',
      'Miscellaneous'),
 ]

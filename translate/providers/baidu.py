@@ -41,10 +41,7 @@ class BaiduProvider(BaseProvider):
             res = await requests.post(self.base_url, data=data)
             trans_result = json.loads(res.content).get(
                 'trans_result')[0].get("dst")
-            return [trans_result]
+            return trans_result
         except Exception as err:
-            if self.ignore_error:
-                logging.error(err)
-            else:
-                raise TranslationError(err)
+            self.error = err
 

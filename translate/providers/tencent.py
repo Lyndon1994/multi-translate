@@ -5,12 +5,9 @@ from datetime import datetime
 import hashlib
 import hmac
 import logging
-import sys
 import time
 # import requests
 import requests_async as requests
-import json
-import utils
 from urllib.parse import urlencode
 
 from .base import BaseProvider
@@ -18,21 +15,10 @@ from ..exceptions import TranslationError
 
 
 class TencentProvider(BaseProvider):
-
     name = 'tencent'
-    url = "http://fanyi-api.Tencent.com/api/trans/vip/translate"
 
     endpoint = "tmt.tencentcloudapi.com"
-    constructed_url = "https://" + endpoint
-    headers = {
-        'Host': endpoint,
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'X-TC-Action': 'TextTranslate',
-        'X-TC-Version': '2018-03-21',
-        'X-TC-Region': 'ap-beijing',
-        'X-TC-Language': 'zh-CN',
-        'X-TC-RequestClient': 'SDK_PYTHON_3.0.644'
-    }
+    base_url = "https://" + endpoint
 
     def __init__(self, **kwargs):
         try:
@@ -43,7 +29,15 @@ class TencentProvider(BaseProvider):
         self.secret_id = kwargs.get('secret_id', '')
         self.secret_key = kwargs.get('secret_key', '')
         self.project_id = kwargs.get('project_id', 0)
-        
+        self.headers = {
+            'Host': self.endpoint,
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-TC-Action': 'TextTranslate',
+            'X-TC-Version': '2018-03-21',
+            'X-TC-Region': 'ap-beijing',
+            'X-TC-Language': 'zh-CN',
+            'X-TC-RequestClient': 'SDK_PYTHON_3.0.644'
+        }
 
     async def get_translation(self, txt):
         try:
@@ -65,14 +59,10 @@ class TencentProvider(BaseProvider):
             self.headers["Authorization"] = auth
 
             request = await requests.get(
-                self.constructed_url + '?' + querystring, None, headers=self.headers, verify=False)
-            return [request.json()['Response']['TargetText']]
+                self.base_url + '?' + querystring, None, headers=self.headers, verify=False)
+            return request.json()['Response']['TargetText']
         except Exception as err:
-            if self.ignore_error:
-                logging.error(err)
-            else:
-                raise TranslationError(err)
-
+            self.error = err
 
     def _get_tc3_signature(self, querystring, date, service):
         canonical_uri = "/"
@@ -100,11 +90,10 @@ class TencentProvider(BaseProvider):
         canonical_request = canonical_request.encode("utf8")
         digest = hashlib.sha256(canonical_request).hexdigest()
         string2sign = '%s\n%s\n%s\n%s' % (algorithm,
-                                        self.headers["X-TC-Timestamp"],
-                                        credential_scope,
-                                        digest)
+                                          self.headers["X-TC-Timestamp"],
+                                          credential_scope,
+                                          digest)
         return self.__sign_tc3(self.secret_key, date, service, string2sign)
-
 
     def __sign_tc3(self, secret_key, date, service, str2sign):
         def _hmac_sha256(key, msg):
@@ -119,4 +108,3 @@ class TencentProvider(BaseProvider):
         signing_key = _get_signature_key(secret_key, date, service)
         signature = _hmac_sha256(signing_key, str2sign).hexdigest()
         return signature
-

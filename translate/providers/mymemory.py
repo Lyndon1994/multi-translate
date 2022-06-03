@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
+import logging
+
 import requests_async as requests
 
 from .base import BaseProvider
@@ -19,9 +21,8 @@ class MyMemoryProvider(BaseProvider):
     http://mymemory.translated.net/doc/usagelimits.php
                                                     Tips from: @Bachstelze
     '''
-    name = 'MyMemory'
+    name = 'mymemory'
     base_url = 'http://api.mymemory.translated.net/get'
-    session = None
 
     def __init__(self, **kwargs):
         try:
@@ -37,23 +38,21 @@ class MyMemoryProvider(BaseProvider):
         if self.email:
             params['de'] = self.email
 
-        if self.session is None:
-            self.session = requests.Session()
-        response = await self.session.get(self.base_url, params=params, headers=self.headers)
-        # response.raise_for_status()
+        response = await requests.get(self.base_url, params=params, headers=self.headers)
+        response.raise_for_status()
         return response.json()
 
     async def get_translation(self, text):
         data = await self._make_request(text)
-
+        logging.debug(data)
         translation = data['responseData']['translatedText']
         if data['responseStatus'] != 200:
             e = TranslationError(translation)
             e.json = data
             raise e
         if translation:
-            return [translation]
+            return translation
         else:
             matches = data['matches']
             next_best_match = next(match for match in matches)
-            return [next_best_match['translation']]
+            return next_best_match['translation']

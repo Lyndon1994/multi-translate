@@ -10,14 +10,16 @@ class BaseProvider:
     name = ''
     base_url = ''
 
-    def __init__(self, to_lang, from_lang='auto', **kwargs):
+    def __init__(self, to_lang, from_lang='en', **kwargs):
         self.headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebit/535.19'
                                       '(KHTML, like Gecko) Chrome/18.0.1025.168 Safari/535.19'}
         self.from_lang = from_lang
         self.to_lang = to_lang
+        self.ignore_error = kwargs.get('ignore_error', True)
+        self.proxies = kwargs.get("proxies")
         self.kwargs = kwargs
-        self.ignore_error = True
+        self.error = None
 
     @abstractmethod
-    def get_translation(self, params):
+    async def get_translation(self, params):
         return NotImplemented('Please Implement this method')
